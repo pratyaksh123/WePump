@@ -20,7 +20,7 @@ def register_trial_user(mac_add, email):
         return res.reason
 
 
-def upadate_user_status(mac_add, status):
+def update_user_status(mac_add, status):
     data = {"status": status}
     res = requests.put(BASE_URL+'/update/'+mac_add, data=data)
     if(res.status_code == 200):
