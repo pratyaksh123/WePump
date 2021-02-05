@@ -17,7 +17,7 @@ quoteOrderQty = data['BtcToSpend']
 percent_change = data['percentChange']
 client = Client(api_key, api_secret)
 telegram_client = TelegramClient('anon', telegram_App_id, telegram_api_hash)
-sell_time = 25
+sell_time = 20
 
 
 def Average(lst):
@@ -78,7 +78,7 @@ async def my_event_handler(event):
                 quantity_brought += float(i['executedQty'])
             price_brought = Average(price_brought_list)
         price_to_sell = calculate_target_price(price_brought)
-        print("Buying process complete !")
+        print(f"Buying process complete ! price brought - f{price_brought}")
         countdown(sell_time, coin_symbol)
         sell_order = limit_sell(coin_symbol, quantity_brought, price_to_sell)
         print(sell_order)
