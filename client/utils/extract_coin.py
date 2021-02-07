@@ -1,6 +1,3 @@
-import re
-
-
 def extract(message):
     x = str(message).find("$")
     if x == -1:
