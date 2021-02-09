@@ -11,7 +11,8 @@ def Telegram(data, testMode):
     else:
         channel_id = data["channel_id"]
 
-    telegram_client = TelegramClient("anon", telegram_App_id, telegram_api_hash)
+    telegram_client = TelegramClient(
+        "anon-3", telegram_App_id, telegram_api_hash)
 
     @telegram_client.on(events.NewMessage)
     async def my_event_handler(event):

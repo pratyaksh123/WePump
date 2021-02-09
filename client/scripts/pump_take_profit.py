@@ -200,4 +200,5 @@ def pump_take_profit(data, Trial):
             await telegram_client.disconnect()
 
         telegram_client.start()
+        print("Listening For messages (press Ctrl+c to exit) !")
         telegram_client.run_until_disconnected()

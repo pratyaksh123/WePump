@@ -3,6 +3,7 @@ import api.index as api
 import json
 import scripts.pump_take_profit as pump
 import scripts.telegram as tel
+import scripts.print_channel_ids as chn
 import scripts.Check_balance as cb
 
 
@@ -40,4 +41,7 @@ def Trial(mac_add):
             first_menu = False
             print(cb.Check_balance(data))
         elif x == 5:
+            first_menu = False
+            chn.channel_id(data)
+        elif x == 6:
             exit()
