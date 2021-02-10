@@ -37,6 +37,12 @@ client = Client(api_key, api_secret)
 telegram_client = TelegramClient("anon", telegram_App_id, telegram_api_hash)
 
 
+def update_precision(quantity):
+    precision = 5
+    amt_str = "{:0.0{}f}".format(float(quantity), precision)
+    return amt_str
+
+
 def set_status_to_expire(mac_add):
     res = api.update_user_status(mac_add, "Expired")
     if res != "Success":
@@ -48,11 +54,11 @@ def create_market_order(symbol):
     try:
         order = client.order_market_buy(
             symbol=symbol,
-            quoteOrderQty=quantity,
+            quoteOrderQty=update_precision(quantity),
         )
         return order
     except BinanceAPIException as e:
-        print(e.message)
+        print(f"Market Buy Error - {e}")
 
 
 def create_market_order_sell(symbol, quantity):
@@ -63,17 +69,11 @@ def create_market_order_sell(symbol, quantity):
         )
         return order
     except BinanceAPIException as e:
-        print(e.message)
+        print(f"Market Sell Error - {e}")
 
 
 def Average(lst):
     return sum(lst) / len(lst)
-
-
-def update_precision(quantity):
-    precision = 5
-    amt_str = "{:0.0{}f}".format(float(quantity), precision)
-    return amt_str
 
 
 def calculate_target_price(price, percent_change, loss):
@@ -99,7 +99,7 @@ def setup_take_profit(price_brought, quantity_brought, symbol):
         )
         return order_take_ptf
     except BinanceAPIException as e:
-        print(e.message)
+        print(f"Take Profit Error - {e}")
 
 
 def setup_stop_loss(price_brought, quantity_brought, symbol):
@@ -117,7 +117,7 @@ def setup_stop_loss(price_brought, quantity_brought, symbol):
         )
         return order_take_loss
     except BinanceAPIException as e:
-        print(e.message)
+        print(f"Stop Loss Error - {e}")
 
 
 def start_main(symbol, Trial):
@@ -164,10 +164,17 @@ def start_main(symbol, Trial):
                     sp_triggered = True
 
             if not Tp_triggered and not sp_triggered:
+                # Cancel open orders first or some coins will be locked
+                if tp_order_id:
+                    client.cancel_order(symbol=symbol, orderId=tp_order_id)
+                if sp_order_id:
+                    client.cancel_order(symbol=symbol, orderId=sp_order_id)
                 print(
                     "None of Take profit or stop loss were triggered ! Selling ASAP !"
                 )
-                order = create_market_order_sell(symbol, quantity_brought)
+                order = create_market_order_sell(
+                    symbol, update_precision(quantity_brought)
+                )
                 if order:
                     print("Market sell successful !")
     if Trial:
