@@ -137,15 +137,21 @@ def start_main(symbol, Trial):
             f"Market Buy successful at price {price_brought} and quantity brought - {quantity_brought}"
         )
         if take_profit == "true":
-            take_profit_order = setup_take_profit(
-                price_brought, quantity_brought, symbol
-            )
+            try:
+                take_profit_order = setup_take_profit(
+                    price_brought, quantity_brought, symbol
+                )
+            except BinanceAPIException as e:
+                print(f"Take profit Error - {e}")
             if take_profit_order:
                 print(f"Take Profit successfully set!")
                 tp_order_id = take_profit_order["orderId"]
         if stopLoss == "true":
-            stop_loss_order = setup_stop_loss(
-                price_brought, quantity_brought, symbol)
+            try:
+                stop_loss_order = setup_stop_loss(
+                    price_brought, quantity_brought, symbol)
+            except BinanceAPIException as e:
+                print(f"Stop Loss Error - {e}")
             if stop_loss_order:
                 print(f"Stop Loss successfully set !")
                 sp_order_id = stop_loss_order["orderId"]
