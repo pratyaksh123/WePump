@@ -141,20 +141,22 @@ def start_main(symbol, Trial):
                 take_profit_order = setup_take_profit(
                     price_brought, quantity_brought, symbol
                 )
+                if take_profit_order:
+                    print(f"Take Profit successfully set!")
+                    tp_order_id = take_profit_order["orderId"]
             except BinanceAPIException as e:
                 print(f"Take profit Error - {e}")
-            if take_profit_order:
-                print(f"Take Profit successfully set!")
-                tp_order_id = take_profit_order["orderId"]
+
         if stopLoss == "true":
             try:
                 stop_loss_order = setup_stop_loss(
                     price_brought, quantity_brought, symbol)
+                if stop_loss_order:
+                    print(f"Stop Loss successfully set !")
+                    sp_order_id = stop_loss_order["orderId"]
             except BinanceAPIException as e:
                 print(f"Stop Loss Error - {e}")
-            if stop_loss_order:
-                print(f"Stop Loss successfully set !")
-                sp_order_id = stop_loss_order["orderId"]
+
         if sell_time > 0:
             t = sell_time
             while t:
@@ -167,18 +169,18 @@ def start_main(symbol, Trial):
                 try:
                     order_status_tp = client.get_order(
                         symbol=symbol, orderId=tp_order_id)
+                    if order_status_tp["status"] == "TRADE":
+                        Tp_triggered = True
                 except BinanceAPIException as e:
                     print(f"Failed to get TP Order - {e}")
-                if order_status_tp["status"] == "TRADE":
-                    Tp_triggered = True
             elif sp_order_id:
                 try:
                     order_status_sp = client.get_order(
                         symbol=symbol, orderId=sp_order_id)
+                    if order_status_sp["status"] == "TRADE":
+                        sp_triggered = True
                 except BinanceAPIException as e:
                     print(f"Failed to get SL Order - {e}")
-                if order_status_sp["status"] == "TRADE":
-                    sp_triggered = True
 
             if not Tp_triggered and not sp_triggered:
                 # Cancel open orders first or some coins will be locked
