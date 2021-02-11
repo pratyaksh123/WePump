@@ -164,22 +164,34 @@ def start_main(symbol, Trial):
                 time.sleep(1)
                 t -= 1
             if tp_order_id:
-                order_status_tp = client.get_order(
-                    symbol=symbol, orderId=tp_order_id)
+                try:
+                    order_status_tp = client.get_order(
+                        symbol=symbol, orderId=tp_order_id)
+                except BinanceAPIException as e:
+                    print(f"Failed to get TP Order - {e}")
                 if order_status_tp["status"] == "TRADE":
                     Tp_triggered = True
             elif sp_order_id:
-                order_status_sp = client.get_order(
-                    symbol=symbol, orderId=sp_order_id)
+                try:
+                    order_status_sp = client.get_order(
+                        symbol=symbol, orderId=sp_order_id)
+                except BinanceAPIException as e:
+                    print(f"Failed to get SL Order - {e}")
                 if order_status_sp["status"] == "TRADE":
                     sp_triggered = True
 
             if not Tp_triggered and not sp_triggered:
                 # Cancel open orders first or some coins will be locked
                 if tp_order_id:
-                    client.cancel_order(symbol=symbol, orderId=tp_order_id)
+                    try:
+                        client.cancel_order(symbol=symbol, orderId=tp_order_id)
+                    except BinanceAPIException as e:
+                        print(f"Failed to cancel Tp order - {e}")
                 if sp_order_id:
-                    client.cancel_order(symbol=symbol, orderId=sp_order_id)
+                    try:
+                        client.cancel_order(symbol=symbol, orderId=sp_order_id)
+                    except BinanceAPIException as e:
+                        print(f"Failed to cancel SL order - {e}")
                 print(
                     "None of Take profit or stop loss were triggered ! Selling ASAP !"
                 )
