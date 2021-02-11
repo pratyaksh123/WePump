@@ -35,6 +35,8 @@ channel_id = data["channel_id"]
 
 client = Client(api_key, api_secret)
 telegram_client = TelegramClient("anon", telegram_App_id, telegram_api_hash)
+coin_symbol = ''
+coin_extract_status = False
 
 
 def update_precision(quantity):
@@ -142,7 +144,8 @@ def start_main(symbol, Trial):
                 print(f"Take Profit successfully set!")
                 tp_order_id = take_profit_order["orderId"]
         if stopLoss == "true":
-            stop_loss_order = setup_stop_loss(price_brought, quantity_brought, symbol)
+            stop_loss_order = setup_stop_loss(
+                price_brought, quantity_brought, symbol)
             if stop_loss_order:
                 print(f"Stop Loss successfully set !")
                 sp_order_id = stop_loss_order["orderId"]
@@ -155,11 +158,13 @@ def start_main(symbol, Trial):
                 time.sleep(1)
                 t -= 1
             if tp_order_id:
-                order_status_tp = client.get_order(symbol=symbol, orderId=tp_order_id)
+                order_status_tp = client.get_order(
+                    symbol=symbol, orderId=tp_order_id)
                 if order_status_tp["status"] == "TRADE":
                     Tp_triggered = True
             elif sp_order_id:
-                order_status_sp = client.get_order(symbol=symbol, orderId=sp_order_id)
+                order_status_sp = client.get_order(
+                    symbol=symbol, orderId=sp_order_id)
                 if order_status_sp["status"] == "TRADE":
                     sp_triggered = True
 
@@ -184,9 +189,9 @@ def start_main(symbol, Trial):
 
 
 def pump_take_profit(data, Trial):
-    # display settings then
     print("Do you want to use telegram capture mode(Y/N) ?")
     telegram_mode = input()
+    global coin_symbol, coin_extract_status
     if telegram_mode == "N" or telegram_mode == "n":
         print("Enter Coin name")
         x = input()
@@ -198,14 +203,20 @@ def pump_take_profit(data, Trial):
         async def my_event_handler(event):
             chat_id = event.chat_id
             if chat_id == channel_id:
+                global coin_symbol
+                global coin_extract_status
                 coin_symbol = (extract(event.raw_text) + "BTC").upper()
-                if not re.match("^[A-Z0-9-_.]{1,20}$", coin_symbol):
-                    print("Failed to detect coin, enter manually")
-                    coin_symbol = (input() + "BTC").upper()
-            print(f"Coin to pump detected - {coin_symbol}")
-            start_main(coin_symbol, Trial)
-            await telegram_client.disconnect()
+                if re.match("^[A-Z0-9-_.]{1,20}$", coin_symbol):
+                    print(f"Coin to pump detected - {coin_symbol}")
+                    coin_extract_status = True
+
+                await telegram_client.disconnect()
 
         telegram_client.start()
         print("Listening For messages (press Ctrl+c to exit) !")
         telegram_client.run_until_disconnected()
+        if(not coin_extract_status):
+            print("Failed to detect coin, enter manually")
+            coin_symbol = (input() + "BTC").upper()
+        if(coin_symbol != ''):
+            start_main(coin_symbol, Trial)

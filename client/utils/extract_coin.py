@@ -1,9 +1,7 @@
 def extract(message):
     x = str(message).find("$")
     if x == -1:
-        print("Failed to detect coin, enter manually")
-        inp = input()
-        return inp
+        return 'apdoijnfapdsiofjnpijj'
     else:
         lower = x + 1
         upper = x + 3  # default upper of 3 chars

@@ -21,27 +21,27 @@ def Trial(mac_add):
     while True:
         if not first_menu:
             common.Common_Menu()
-        x = int(input())
-        if x == 1:
+        x = input()
+        if x == '1':
             first_menu = False
             json_formatted_str = json.dumps(data, indent=2)
             print("Current Settings - ")
             print(json_formatted_str)
-        elif x == 2:
+        elif x == '2':
             first_menu = False
             print("Do you wish to start the bot (Y/N) ?")
             inp = input()
             if inp == "Y" or inp == "y":
                 pump.pump_take_profit(data, True)
-        elif x == 3:
+        elif x == '3':
             # Test Telegram integration
             first_menu = False
             tel.Telegram(data, testMode=True)
-        elif x == 4:
+        elif x == '4':
             first_menu = False
             print(cb.Check_balance(data))
-        elif x == 5:
+        elif x == '5':
             first_menu = False
             chn.channel_id(data)
-        elif x == 6:
+        elif x == '6':
             exit()
