@@ -225,7 +225,6 @@ def start_main(symbol, Trial):
                 try:
                     order_status_tp = client.get_order(
                         symbol=symbol, orderId=tp_order_id)
-                    print(order_status_tp)
                     if order_status_tp["status"] == "FILLED":
                         Tp_triggered = True
                 except BinanceAPIException as e:
