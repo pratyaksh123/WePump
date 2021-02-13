@@ -10,6 +10,7 @@ import scripts.telegram as tel
 from utils.extract_coin import extract
 import re
 from telethon import TelegramClient, events
+import math
 
 with open("./config.json") as f:
     data = json.load(f)
@@ -86,7 +87,7 @@ def calculate_target_price(price, percent_change, loss):
     return final_price
 
 
-def setup_take_profit(price_brought, quantity_brought, symbol):
+def setup_take_profit(price_brought, quantity_brought, symbol, info):
     price = calculate_target_price(price_brought, takeProfitLimit, False)
     stopPrice = calculate_target_price(price_brought, takeProfitAt, False)
     try:
@@ -94,9 +95,9 @@ def setup_take_profit(price_brought, quantity_brought, symbol):
             symbol=symbol,
             side=SIDE_SELL,
             type=ORDER_TYPE_TAKE_PROFIT_LIMIT,
-            quantity=update_precision(quantity_brought),
-            price=update_precision(price),
-            stopPrice=update_precision(stopPrice),
+            quantity=quantity_brought,
+            price=format_value(info, price, symbol),
+            stopPrice=format_value(info, stopPrice, symbol),
             timeInForce=TIME_IN_FORCE_GTC,
         )
         return order_take_ptf
@@ -104,7 +105,7 @@ def setup_take_profit(price_brought, quantity_brought, symbol):
         print(f"Take Profit Error - {e}")
 
 
-def setup_stop_loss(price_brought, quantity_brought, symbol):
+def setup_stop_loss(price_brought, quantity_brought, symbol, info):
     price = calculate_target_price(price_brought, stopLossLimit, True)
     stopPrice = calculate_target_price(price_brought, stopLossAt, True)
     try:
@@ -112,9 +113,9 @@ def setup_stop_loss(price_brought, quantity_brought, symbol):
             symbol=symbol,
             side=SIDE_SELL,
             type=ORDER_TYPE_STOP_LOSS_LIMIT,
-            quantity=update_precision(quantity_brought),
-            price=update_precision(price),
-            stopPrice=update_precision(stopPrice),
+            quantity=quantity_brought,
+            price=format_value(info, price, symbol),
+            stopPrice=format_value(info, stopPrice, symbol),
             timeInForce=TIME_IN_FORCE_GTC,
         )
         return order_take_loss
@@ -122,24 +123,54 @@ def setup_stop_loss(price_brought, quantity_brought, symbol):
         print(f"Stop Loss Error - {e}")
 
 
+def step_size_to_precision(ss):
+    return ss.find('1') - 1
+
+
+def format_value(info, val, symbol):
+    try:
+        step_size = info['filters'][2]['stepSize']
+        precision = step_size_to_precision(step_size)
+        if precision > 0:
+            return "{:0.0{}f}".format(val, precision)
+        return math.floor(int(val))
+    except BinanceAPIException as e:
+        print(e)
+
+
+def get_symbol_info(symbol):
+    try:
+        info = client.get_symbol_info(symbol)
+        return info
+    except BinanceAPIException as e:
+        print(e)
+
+
 def start_main(symbol, Trial):
+    asset = symbol[0:len(symbol)-3]
+    info = get_symbol_info(symbol)
     market_order = create_market_order(symbol)
     price_brought_list = []
     tp_order_id, sp_order_id = None, None
     Tp_triggered = False
     sp_triggered = False
+    commission = 0
     if market_order:
         for i in market_order["fills"]:
             price_brought_list.append(float(i["price"]))
-        quantity_brought = market_order["executedQty"]
+            if(i['commissionAsset'] == asset):
+                commission += float(i['commission'])
+        quantity_brought = format_value(info, float(
+            market_order["executedQty"])-commission, symbol)
         price_brought = Average(price_brought_list)
+
         print(
             f"Market Buy successful at price {price_brought} and quantity brought - {quantity_brought}"
         )
         if take_profit == "true":
             try:
                 take_profit_order = setup_take_profit(
-                    price_brought, quantity_brought, symbol
+                    price_brought, quantity_brought, symbol, info
                 )
                 if take_profit_order:
                     print(f"Take Profit successfully set!")
@@ -150,7 +181,7 @@ def start_main(symbol, Trial):
         if stopLoss == "true":
             try:
                 stop_loss_order = setup_stop_loss(
-                    price_brought, quantity_brought, symbol)
+                    price_brought, quantity_brought, symbol, info)
                 if stop_loss_order:
                     print(f"Stop Loss successfully set !")
                     sp_order_id = stop_loss_order["orderId"]
@@ -186,19 +217,21 @@ def start_main(symbol, Trial):
                 # Cancel open orders first or some coins will be locked
                 if tp_order_id:
                     try:
-                        client.cancel_order(symbol=symbol, orderId=tp_order_id)
+                        client.cancel_order(
+                            symbol=symbol, orderId=tp_order_id)
                     except BinanceAPIException as e:
                         print(f"Failed to cancel Tp order - {e}")
                 if sp_order_id:
                     try:
-                        client.cancel_order(symbol=symbol, orderId=sp_order_id)
+                        client.cancel_order(
+                            symbol=symbol, orderId=sp_order_id)
                     except BinanceAPIException as e:
                         print(f"Failed to cancel SL order - {e}")
                 print(
                     "None of Take profit or stop loss were triggered ! Selling ASAP !"
                 )
                 order = create_market_order_sell(
-                    symbol, update_precision(quantity_brought)
+                    symbol, quantity_brought
                 )
                 if order:
                     print("Market sell successful !")
@@ -219,7 +252,7 @@ def pump_take_profit(data, Trial):
         start_main(symbol, Trial)
     elif telegram_mode == "Y" or telegram_mode == "y":
 
-        @telegram_client.on(events.NewMessage)
+        @ telegram_client.on(events.NewMessage)
         async def my_event_handler(event):
             chat_id = event.chat_id
             if chat_id == channel_id:
