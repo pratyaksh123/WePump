@@ -87,17 +87,32 @@ def calculate_target_price(price, percent_change, loss):
     return final_price
 
 
+def get_tick_and_step_size(symbol):
+    tick_size = None
+    step_size = None
+    symbol_info = client.get_symbol_info(symbol)
+    for filt in symbol_info['filters']:
+        if filt['filterType'] == 'PRICE_FILTER':
+            tick_size = float(filt['tickSize'])
+        elif filt['filterType'] == 'LOT_SIZE':
+            step_size = float(filt['stepSize'])
+    return tick_size, step_size
+
+
 def setup_take_profit(price_brought, quantity_brought, symbol, info):
     price = calculate_target_price(price_brought, takeProfitLimit, False)
     stopPrice = calculate_target_price(price_brought, takeProfitAt, False)
+    tick_size, step_size = get_tick_and_step_size(symbol)
+    price_formatted = float_precision(price, tick_size)
+    stop_price_formatted = float_precision(stopPrice, tick_size)
     try:
         order_take_ptf = client.create_order(
             symbol=symbol,
             side=SIDE_SELL,
             type=ORDER_TYPE_TAKE_PROFIT_LIMIT,
             quantity=quantity_brought,
-            price=format_value(info, price, symbol),
-            stopPrice=format_value(info, stopPrice, symbol),
+            price=price_formatted,
+            stopPrice=stop_price_formatted,
             timeInForce=TIME_IN_FORCE_GTC,
         )
         return order_take_ptf
@@ -108,14 +123,17 @@ def setup_take_profit(price_brought, quantity_brought, symbol, info):
 def setup_stop_loss(price_brought, quantity_brought, symbol, info):
     price = calculate_target_price(price_brought, stopLossLimit, True)
     stopPrice = calculate_target_price(price_brought, stopLossAt, True)
+    tick_size, step_size = get_tick_and_step_size(symbol)
+    price_formatted = float_precision(price, tick_size)
+    stop_price_formatted = float_precision(stopPrice, tick_size)
     try:
         order_take_loss = client.create_order(
             symbol=symbol,
             side=SIDE_SELL,
             type=ORDER_TYPE_STOP_LOSS_LIMIT,
             quantity=quantity_brought,
-            price=format_value(info, price, symbol),
-            stopPrice=format_value(info, stopPrice, symbol),
+            price=price_formatted,
+            stopPrice=stop_price_formatted,
             timeInForce=TIME_IN_FORCE_GTC,
         )
         return order_take_loss
@@ -136,6 +154,13 @@ def format_value(info, val, symbol):
         return math.floor(int(val))
     except BinanceAPIException as e:
         print(e)
+
+
+def float_precision(f, n):
+    n = int(math.log10(1 / float(n)))
+    f = math.floor(float(f) * 10 ** n) / 10 ** n
+    f = "{:0.0{}f}".format(float(f), n)
+    return str(int(f)) if int(n) == 0 else f
 
 
 def get_symbol_info(symbol):
@@ -200,7 +225,8 @@ def start_main(symbol, Trial):
                 try:
                     order_status_tp = client.get_order(
                         symbol=symbol, orderId=tp_order_id)
-                    if order_status_tp["status"] == "TRADE":
+                    print(order_status_tp)
+                    if order_status_tp["status"] == "FILLED":
                         Tp_triggered = True
                 except BinanceAPIException as e:
                     print(f"Failed to get TP Order - {e}")
@@ -208,7 +234,7 @@ def start_main(symbol, Trial):
                 try:
                     order_status_sp = client.get_order(
                         symbol=symbol, orderId=sp_order_id)
-                    if order_status_sp["status"] == "TRADE":
+                    if order_status_sp["status"] == "FILLED":
                         sp_triggered = True
                 except BinanceAPIException as e:
                     print(f"Failed to get SL Order - {e}")
