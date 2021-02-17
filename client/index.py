@@ -2,10 +2,12 @@ import api.index as api
 from utils.get_mac_id import get_mac
 import json
 from scripts import Trial, Active, Expired
+import os
 
 
 mac_address = get_mac()
 response = api.get_user(mac_address)
+os.system('color')
 if(response == 'Not Found'):
     # register the user
     print('Enter you email id to register for trial plan')

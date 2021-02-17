@@ -32,7 +32,7 @@ def Active():
             elif x == '3':
                 # Test Telegram integration
                 first_menu = False
-                tel.Telegram(data, testMode=True)
+                tel.Telegram(data)
             elif x == '4':
                 first_menu = False
                 print(cb.Check_balance(data))
