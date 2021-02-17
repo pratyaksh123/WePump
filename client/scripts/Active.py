@@ -6,6 +6,7 @@ import scripts.telegram as tel
 import scripts.print_channel_ids as chn
 import scripts.Check_balance as cb
 from termcolor import colored
+from sys import exit
 
 
 def Active():

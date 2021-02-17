@@ -3,7 +3,7 @@ from utils.get_mac_id import get_mac
 import json
 from scripts import Trial, Active, Expired
 import os
-
+from sys import exit
 
 mac_address = get_mac()
 response = api.get_user(mac_address)
