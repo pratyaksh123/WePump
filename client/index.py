@@ -24,4 +24,4 @@ else:
     elif(data['status'] == 'Expired'):
         Expired.Expired()
     elif(data['status'] == 'Active'):
-        Active.Active(mac_address)
+        Active.Active()
