@@ -52,7 +52,7 @@ class Bot:
             )
             return order
         except BinanceAPIException as e:
-            print(f"Market Buy Error - {e}")
+            print(colored(f"Market Buy Error - {e}", 'red'))
 
     def create_market_order_sell(self):
         try:
@@ -210,7 +210,7 @@ class Bot:
                 while t:
                     mins, secs = divmod(t, 60)
                     timer = "{:02d}:{:02d}".format(mins, secs)
-                    print(colored(timer, 'blue'), end="\r")
+                    print(colored(timer, 'yellow'), end="\r")
                     time.sleep(1)
                     t -= 1
                 if(self.tp_order_id):
@@ -278,7 +278,7 @@ class Bot:
     def set_status_to_expire(self, mac_add):
         res = api.update_user_status(mac_add, "Expired")
         if res != "Success":
-            print("Fatal Error, Please contact support")
+            print(colored("Fatal Error, Please contact support", 'red'))
 
     def initialise(self):
         if(self.useTelegramCapture == 'true'):
