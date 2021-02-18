@@ -1,7 +1,7 @@
 def extract(message):
     x = str(message).find("$")
     if x == -1:
-        return 'apdoijnfapdsiofjnpijj'
+        return "apdoijnfapdsiofjnpijj"
     else:
         lower = x + 1
         upper = x + 3  # default upper of 3 chars

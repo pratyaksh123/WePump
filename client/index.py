@@ -7,23 +7,24 @@ from sys import exit
 
 mac_address = get_mac()
 response = api.get_user(mac_address)
-os.system('color')
-if(response == 'Not Found'):
+os.system("color")
+if response == "Not Found":
     # register the user
-    print('Enter you email id to register for trial plan')
+    print("Enter you email id to register for trial plan")
     email_inp = input()
     res = api.register_trial_user(mac_address, email_inp)
-    if(res == 'Success'):
+    if res == "Success":
         print(
-            'Congrats you are now registered on the trial plan, Rerun the BOT to continue !')
+            "Congrats you are now registered on the trial plan, Rerun the BOT to continue !"
+        )
     else:
-        print('Couldn\'t register, please contact support')
+        print("Couldn't register, please contact support")
         exit()
 else:
     data = json.loads(response)
-    if(data['status'] == 'Trial'):
+    if data["status"] == "Trial":
         Trial.Trial(mac_add=mac_address)
-    elif(data['status'] == 'Expired'):
+    elif data["status"] == "Expired":
         Expired.Expired()
-    elif(data['status'] == 'Active'):
+    elif data["status"] == "Active":
         Active.Active()

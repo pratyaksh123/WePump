@@ -25,32 +25,32 @@ def Trial(mac_add):
             if not first_menu:
                 common.Common_Menu()
             x = input()
-            if x == '1':
+            if x == "1":
                 first_menu = False
                 json_formatted_str = json.dumps(data, indent=2)
                 print("Current Settings - ")
                 print(json_formatted_str)
-            elif x == '2':
+            elif x == "2":
                 first_menu = False
                 print("Do you wish to start the bot (Y/N) ?")
                 inp = input()
                 if inp == "Y" or inp == "y":
                     pump.main(data, True)
-            elif x == '3':
+            elif x == "3":
                 # Test Telegram integration
                 first_menu = False
                 tel.Telegram(data)
-            elif x == '4':
+            elif x == "4":
                 first_menu = False
                 print(cb.Check_balance(data))
-            elif x == '5':
+            elif x == "5":
                 first_menu = False
                 chn.channel_id(data)
-            elif x == '6':
+            elif x == "6":
                 exit()
             else:
                 first_menu = False
-                print(colored('Wrong Input Given', 'yellow'))
+                print(colored("Wrong Input Given", "yellow"))
     except ValueError as e:
         print(e)
-        print(colored('Please Recheck your config.json', 'red'))
+        print(colored("Please Recheck your config.json", "red"))
