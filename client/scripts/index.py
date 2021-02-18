@@ -12,6 +12,7 @@ import json
 import time
 import re
 import math
+import webbrowser
 
 
 class Bot:
@@ -173,6 +174,11 @@ class Bot:
         except BinanceAPIException as e:
             print(colored(f"OCO order Error - {e}", 'red'))
 
+    def openCurrencyChart(self):
+        curreny_url_binance= f'https://www.binance.com/en/trade/{self.coin_currency}_BTC?layout=basic'
+        webbrowser.open(curreny_url_binance)
+
+
     def start(self):
         self.coin_currency = self.coin_symbol[0:len(self.coin_symbol)-3]
         self.get_asset_info()
@@ -205,6 +211,7 @@ class Bot:
                 if(self.oco_order):
                     print(
                         colored(f"Take Profit and Stop Loss Successfully Set!", 'green'))
+            self.openCurrencyChart()
             if(self.timeout > 0):
                 t = self.timeout
                 while t:
