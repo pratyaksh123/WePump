@@ -2,6 +2,7 @@ import api.index as api
 from utils.get_mac_id import get_mac
 import json
 from scripts import Trial, Active, Expired
+from termcolor import colored
 import os
 from sys import exit
 
@@ -10,20 +11,23 @@ response = api.get_user(mac_address)
 os.system("color")
 if response == "Not Found":
     # register the user
-    print("Enter you email id to register for trial plan")
+    print("Please enter you email id to register for trial plan")
     email_inp = input()
     res = api.register_trial_user(mac_address, email_inp)
     if res == "Success":
         print(
-            "Congrats you are now registered on the trial plan, Rerun the BOT to continue !"
+            colored(
+                "Congrats you are now registered on the trial plan, Rerun the BOT to continue !",
+                "green",
+            )
         )
     else:
-        print("Couldn't register, please contact support")
+        print(colored("Couldn't register, please contact support", "yellow"))
         exit()
 else:
     data = json.loads(response)
     if data["status"] == "Trial":
-        Trial.Trial(mac_add=mac_address)
+        Trial.Trial(mac_address)
     elif data["status"] == "Expired":
         Expired.Expired()
     elif data["status"] == "Active":
