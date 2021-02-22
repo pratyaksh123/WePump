@@ -23,6 +23,7 @@ app.post("/api/register-trial", (req, res) => {
             mac_id: req.body.mac_id,
             email_id: req.body.email_id,
             status: "Trial",
+            creation_timestamp: admin.firestore.FieldValue.serverTimestamp(),
           });
       return res.status(200).send("Success");
     } catch (error) {
@@ -57,6 +58,7 @@ app.put("/api/update/:mac_id", (req, res) => {
       const document = db.collection("users").doc(req.params.mac_id);
       await document.update({
         status: req.body.status,
+        updation_timestamp: admin.firestore.FieldValue.serverTimestamp(),
       });
       return res.status(200).send("Success");
     } catch (error) {
