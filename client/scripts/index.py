@@ -8,7 +8,6 @@ import scripts.telegram as tel
 from utils.extract_coin import extract
 from termcolor import colored
 from telethon import TelegramClient, events
-import json
 import time
 import re
 import math
@@ -80,7 +79,7 @@ class Bot:
                 price = float(ticker["price"])
         return price
 
-    def get_tick_and_step_size(self):
+    def get_info(self):
         try:
             tick_size = None
             step_size = None
@@ -96,7 +95,7 @@ class Bot:
 
     def get_asset_info(self):
         try:
-            self.tick_size, self.step_size = self.get_tick_and_step_size()
+            self.tick_size, self.step_size= self.get_info()
         except TypeError as e:
             print(colored(f"Wrong Coin Name Entered - {e}", "red"))
 
@@ -111,6 +110,13 @@ class Bot:
         return final_price
 
     def set_take_profit(self):
+         # PERCENT_PRICE Filter Check
+        if(self.takeProfitAt>=399):
+            print(colored('WARNING : Your Take Profit value is too high, Binance allows only 400% TP to be set','yellow'))
+            self.takeProfitAt=398
+        if(self.takeProfitLimit>=399):
+            print(colored('WARNING : Your Take Profit Limit value is too high, Binance allows only 400% TP to be set','yellow'))
+            self.takeProfitLimit=398
         take_profit_price = self.calculate_target_price(
             self.price_brought, self.takeProfitLimit, False
         )
@@ -134,6 +140,13 @@ class Bot:
             print(colored(f"Take Profit Error - {e}", "red"))
 
     def set_stop_loss(self):
+        # PERCENT_PRICE Filter Check
+        if(self.stopLossAt>=80):
+            print(colored('WARNING :  Your Stop Loss value is too high, Binance allows only 80% stopLoss to be set','yellow'))
+            self.stopLossAt=79
+        if(self.stopLossLimit>=80):
+            print(colored('WARNING :  Your Stop Loss Limit value is too high, Binance allows only 80% stopLoss to be set','yellow'))
+            self.stopLossLimit=79
         stop_loss_price = self.calculate_target_price(
             self.price_brought, self.stopLossLimit, True
         )
@@ -281,6 +294,13 @@ class Bot:
                             )
                         except BinanceAPIException as e:
                             print(colored(f"Failed to Cancel SL order - {e}", "red"))
+                    if self.oco_order:
+                        try:
+                            self.client.cancel_order(
+                                symbol=self.coin_symbol, orderId=self.oco_order["orders"][1]["orderId"]
+                            )
+                        except BinanceAPIException as e:
+                            print(colored(f"Failed to Cancel OCO order - {e}", "red"))
                     print(
                         colored(
                             "None of Take Profit or Stop Loss were triggered, Selling ASAP !",
