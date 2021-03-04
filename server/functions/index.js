@@ -3,7 +3,7 @@ const admin = require("firebase-admin");
 const express = require("express");
 const cors = require("cors");
 const app = express();
-app.use(cors({origin: true}));
+app.use(cors({ origin: true }));
 
 const serviceAccount = require("./permissions.json");
 admin.initializeApp({
@@ -17,14 +17,17 @@ app.post("/api/register-trial", (req, res) => {
   (async () => {
     try {
       await db
-          .collection("users")
-          .doc("/" + req.body.mac_id + "/")
-          .create({
-            mac_id: req.body.mac_id,
-            email_id: req.body.email_id,
-            status: "Trial",
-            creation_timestamp: admin.firestore.FieldValue.serverTimestamp(),
-          });
+        .collection("users")
+        .doc("/" + req.body.mac_id + "/")
+        .create({
+          mac_id: req.body.mac_id,
+          email_id: req.body.email_id,
+          status: "Trial",
+          creation_timestamp: admin.firestore.FieldValue.serverTimestamp(),
+          expiration_timestamp: admin.firestore.Timestamp.fromDate(
+            new Date(new Date().getTime() + 3 * 24 * 60 * 60 * 1000)
+          ).toDate(),
+        });
       return res.status(200).send("Success");
     } catch (error) {
       console.log(error);
@@ -61,6 +64,29 @@ app.put("/api/update/:mac_id", (req, res) => {
         updation_timestamp: admin.firestore.FieldValue.serverTimestamp(),
       });
       return res.status(200).send("Success");
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send(error);
+    }
+  })();
+});
+
+// clean-up DB for expired users
+app.get("/api/cleanup-expired", (req, res) => {
+  (async () => {
+    try {
+      const document_ref = db.collection("users");
+      document_ref
+        .where("expiration_timestamp", "<", admin.firestore.Timestamp.now())
+        .get()
+        .then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            doc.ref.update({
+              status: "Expired",
+            });
+          });
+        });
+      return res.status(200).send("Updated");
     } catch (error) {
       console.log(error);
       return res.status(500).send(error);
