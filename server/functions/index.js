@@ -81,9 +81,11 @@ app.get("/api/cleanup-expired", (req, res) => {
         .get()
         .then((querySnapshot) => {
           querySnapshot.forEach((doc) => {
+            if(doc.data().status=='Trial'){
             doc.ref.update({
               status: "Expired",
             });
+          }
           });
         });
       return res.status(200).send("Updated");
