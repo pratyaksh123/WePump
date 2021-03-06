@@ -6,7 +6,6 @@ module.exports = {
   },
   extends: ['eslint:recommended', 'google'],
   rules: {
-    quotes: 'double',
     'linebreak-style': 0,
   },
   parser: 'babel-eslint',
