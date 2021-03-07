@@ -23,6 +23,7 @@ app.post('/api/register-trial', (req, res) => {
           .create({
             mac_id: req.body.mac_id,
             email_id: req.body.email_id,
+            password: req.body.password,
             status: 'Trial',
             creation_timestamp: admin.firestore.FieldValue.serverTimestamp(),
             expiration_timestamp: admin.firestore.Timestamp.fromDate(
@@ -36,24 +37,101 @@ app.post('/api/register-trial', (req, res) => {
     }
   })();
 });
+
 // get
 app.get('/api/read/:mac_id', (req, res) => {
   (async () => {
     try {
-      const document = db.collection('users').doc(req.params.mac_id);
-      const item = await document.get();
-      const response = item.data();
-      if (response) {
-        return res.status(200).send(response);
-      } else {
-        return res.status(200).send('Not Found');
-      }
+      const document_ref = db.collection('users');
+      document_ref
+          .where('mac_id', '==', req.params.mac_id)
+          .get()
+          .then((querySnapshot) => {
+            if (querySnapshot.size==1) {
+              querySnapshot.forEach((doc)=>{
+                return res.status(200).send(doc.data());
+              });
+            } else {
+              return res.status(200).send(false);
+            }
+          });
     } catch (error) {
       console.log(error);
       return res.status(500).send(error);
     }
   })();
 });
+
+app.get('/api/check_email/:email_id', (req, res) => {
+  (async () => {
+    try {
+      const document_ref = db.collection('users');
+      document_ref
+          .where('email_id', '==', req.params.email_id)
+          .get()
+          .then((querySnapshot) => {
+            if (querySnapshot.size>=1) {
+              return res.status(200).send(true);
+            } else {
+              return res.status(200).send(false);
+            }
+          });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send(error);
+    }
+  })();
+});
+
+
+app.get('/api/check_password/:password', (req, res) => {
+  (async () => {
+    try {
+      const document_ref = db.collection('users');
+      document_ref
+          .where('password', '==', req.params.password)
+          .get()
+          .then((querySnapshot) => {
+            if (querySnapshot.size>=1) {
+              return res.status(200).send(true);
+            } else {
+              return res.status(200).send(false);
+            }
+          });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send(error);
+    }
+  })();
+});
+
+
+app.put('/api/update_mac_id/:email_id', (req, res) => {
+  (async () => {
+    try {
+      const document_ref = db.collection('users');
+      document_ref
+          .where('email_id', '==', req.params.email_id)
+          .get()
+          .then((querySnapshot) => {
+            if (querySnapshot.size==1) {
+              querySnapshot.forEach((doc)=>{
+                doc.ref.update({
+                  mac_id: req.body.mac_id,
+                });
+              });
+              return res.status(200).send(true);
+            } else {
+              return res.status(200).send(false);
+            }
+          });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send(error);
+    }
+  })();
+});
+
 
 // update
 app.put('/api/update/:mac_id', (req, res) => {
