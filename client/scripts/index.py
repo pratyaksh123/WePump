@@ -328,15 +328,7 @@ class Bot:
                         )
                     if self.sl_triggered:
                         print(colored("Your Stop Loss Order was triggered !", "green"))
-            if self.isTrial:
-                mac_address = get_mac()
-                if market_order and market_order["status"] == "FILLED":
-                    self.set_status_to_expire(mac_address)
 
-    def set_status_to_expire(self, mac_add):
-        res = api.update_user_status(mac_add, "Expired")
-        if res != "Success":
-            print(colored("Fatal Error, Please contact support", "red"))
 
     def initialise(self):
         if self.useTelegramCapture == "true":

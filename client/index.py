@@ -59,7 +59,7 @@ if response == "false":
 else:
     data = json.loads(response)
     if data["status"] == "Trial":
-        Trial.Trial(mac_address)
+        Trial.Trial()
     elif data["status"] == "Expired":
         Expired.Expired()
     elif data["status"] == "Active":

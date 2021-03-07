@@ -40,7 +40,10 @@ def Active():
             elif x == "5":
                 first_menu = False
                 chn.channel_id(data)
-            elif x == "6":
+            elif x=='6':
+                first_menu = False
+                pass
+            elif x == "7":
                 exit()
             else:
                 first_menu = False

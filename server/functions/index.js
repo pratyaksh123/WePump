@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable camelcase */
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
@@ -133,16 +134,26 @@ app.put('/api/update_mac_id/:email_id', (req, res) => {
 });
 
 
-// update
-app.put('/api/update/:mac_id', (req, res) => {
+// update password
+app.put('/api/update_password/:mac_id', (req, res) => {
   (async () => {
     try {
-      const document = db.collection('users').doc(req.params.mac_id);
-      await document.update({
-        status: req.body.status,
-        updation_timestamp: admin.firestore.FieldValue.serverTimestamp(),
-      });
-      return res.status(200).send('Success');
+      const document_ref = db.collection('users');
+      document_ref
+          .where('mac_id', '==', req.params.mac_id)
+          .get()
+          .then((querySnapshot) => {
+            if (querySnapshot.size==1) {
+              querySnapshot.forEach((doc)=>{
+                doc.ref.update({
+                  password: req.body.password,
+                });
+                return res.status(200).send('Success');
+              });
+            } else {
+              return res.status(200).send(false);
+            }
+          });
     } catch (error) {
       console.log(error);
       return res.status(500).send(error);

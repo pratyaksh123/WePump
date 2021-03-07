@@ -23,14 +23,6 @@ def register_trial_user(mac_add, email, password):
         return res.reason
 
 
-def update_user_status(mac_add, status):
-    data = {"status": status}
-    res = requests.put(BASE_URL + "/update/" + mac_add, data=data)
-    if res.status_code == 200:
-        return res.text
-    else:
-        return res.reason
-
 def check_email(email_id):
     res = requests.get(BASE_URL + "/check_email/" + email_id)
     if res.status_code == 200:

@@ -9,13 +9,7 @@ from termcolor import colored
 from sys import exit
 
 
-def set_status_to_expire(mac_add):
-    res = api.update_user_status(mac_add, "Expired")
-    if res != "Success":
-        print("Fatal Error, Please contact support")
-
-
-def Trial(mac_add):
+def Trial():
     try:
         with open("./config.json") as f:
             data = json.load(f)
@@ -46,7 +40,10 @@ def Trial(mac_add):
             elif x == "5":
                 first_menu = False
                 chn.channel_id(data)
-            elif x == "6":
+            elif x=='6':
+                first_menu = False
+                pass
+            elif x == "7":
                 exit()
             else:
                 first_menu = False

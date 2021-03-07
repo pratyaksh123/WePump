@@ -7,8 +7,8 @@ def Common_Welcome(version_status):
     print("3. Test telegram integration")
     print("4. Check Asset Balance")
     print("5. Check Telegram Channel Ids")
-    print("6. Exit")
-
+    print('6. Change Password')
+    print("7. Exit")
 
 def Common_Menu():
     print("1. Check Settings")
@@ -16,4 +16,5 @@ def Common_Menu():
     print("3. Test telegram integration")
     print("4. Check Asset Balance")
     print("5. Check Telegram Channel Ids")
-    print("6. Exit")
+    print('6. Change Password')
+    print("7. Exit")
