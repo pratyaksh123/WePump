@@ -59,6 +59,8 @@ if response == "false":
 else:
     data = json.loads(response)
     if data["status"] == "Trial":
+        timeleft=api.time_trial_left(data['mac_id'])
+        print(colored(f'Your Trial Plan will expire on - {timeleft}','yellow'))
         Trial.Trial(mac_address)
     elif data["status"] == "Expired":
         Expired.Expired()

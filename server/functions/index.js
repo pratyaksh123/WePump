@@ -63,6 +63,34 @@ app.get('/api/read/:mac_id', (req, res) => {
   })();
 });
 
+
+// get trial time left
+app.get('/api/get_time_left/:mac_id', (req, res) => {
+  (async () => {
+    try {
+      const document_ref = db.collection('users');
+      document_ref
+          .where('mac_id', '==', req.params.mac_id)
+          .get()
+          .then((querySnapshot) => {
+            if (querySnapshot.size==1) {
+              querySnapshot.forEach((doc)=>{
+                const timeleft=doc.data().expiration_timestamp.toDate();
+                return res.status(200).send(timeleft.toString());
+              });
+            } else {
+              return res.status(200).send(false);
+            }
+          }).catch((e)=>{
+            console.log(e);
+          });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send(error);
+    }
+  })();
+});
+
 app.get('/api/check_email/:email_id', (req, res) => {
   (async () => {
     try {
@@ -105,8 +133,6 @@ app.get('/api/get_password/:password', (req, res) => {
     }
   })();
 });
-
-// Fetch password by mac id
 
 
 app.put('/api/update_mac_id/:email_id', (req, res) => {

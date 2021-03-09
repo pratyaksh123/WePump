@@ -60,3 +60,10 @@ def update_password(mac_id, password):
         return res.text
     else:
         return res.reason
+    
+def time_trial_left(mac_id):
+    res = requests.get(BASE_URL + "/get_time_left/" + mac_id)
+    if res.status_code == 200:
+        return res.text
+    else:
+        return res.reason
