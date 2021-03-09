@@ -30,17 +30,32 @@ def check_email(email_id):
     else:
         return res.reason
 
-def check_password(password):
-    res = requests.get(BASE_URL + "/check_password/" + password)
+
+def update_mac_id(email_id, mac_id):
+    data = {"mac_id": mac_id}
+    res = requests.put(BASE_URL + "/update_mac_id/" + email_id, data=data)
     if res.status_code == 200:
         return res.text
     else:
         return res.reason
 
+def get_password_mac_id(mac_id):
+    res = requests.get(BASE_URL + "/get_password_mac_id/" + mac_id)
+    if res.status_code == 200:
+        return res.text
+    else:
+        return res.reason
 
-def update_mac_id(email_id, mac_id):
-    data = {"mac_id": mac_id}
-    res = requests.put(BASE_URL + "/update_mac_id/" + email_id, data=data)
+def get_password(password):
+    res = requests.get(BASE_URL + "/get_password/" + password)
+    if res.status_code == 200:
+        return res.text
+    else:
+        return res.reason
+
+def update_password(mac_id, password):
+    data = {"password": password}
+    res = requests.put(BASE_URL + "/update_password/" + mac_id, data=data)
     if res.status_code == 200:
         return res.text
     else:

@@ -2,6 +2,7 @@ import scripts.Common as common
 import api.index as api
 import json
 import scripts.index as pump
+import scripts.change_password as pass_fuck
 import scripts.telegram as tel
 import scripts.print_channel_ids as chn
 import scripts.Check_balance as cb
@@ -9,7 +10,7 @@ from termcolor import colored
 from sys import exit
 
 
-def Active():
+def Active(mac_id):
     try:
         with open("./config.json") as f:
             data = json.load(f)
@@ -42,7 +43,7 @@ def Active():
                 chn.channel_id(data)
             elif x=='6':
                 first_menu = False
-                pass
+                pass_fuck.change_password(mac_id)
             elif x == "7":
                 exit()
             else:

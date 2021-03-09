@@ -19,7 +19,7 @@ if response == "false":
     if(res_sign_in=='true'):
         # Email found already registered, to check auth , check the password too.
         print(colored('Email Already Registered with the BOT, signing in...','yellow'))
-        res_pass= api.check_password(password)
+        res_pass= api.get_password(password)
         if(res_pass=='true'):
             # True Account owner, but his mac address got changed, so update his previous account with the new mac id.
             res_update_mac_id= api.update_mac_id(email_inp,mac_address)
@@ -59,8 +59,8 @@ if response == "false":
 else:
     data = json.loads(response)
     if data["status"] == "Trial":
-        Trial.Trial()
+        Trial.Trial(mac_address)
     elif data["status"] == "Expired":
         Expired.Expired()
     elif data["status"] == "Active":
-        Active.Active()
+        Active.Active(mac_address)

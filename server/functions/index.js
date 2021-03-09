@@ -71,7 +71,7 @@ app.get('/api/check_email/:email_id', (req, res) => {
           .where('email_id', '==', req.params.email_id)
           .get()
           .then((querySnapshot) => {
-            if (querySnapshot.size>=1) {
+            if (querySnapshot.size==1) {
               return res.status(200).send(true);
             } else {
               return res.status(200).send(false);
@@ -85,7 +85,7 @@ app.get('/api/check_email/:email_id', (req, res) => {
 });
 
 
-app.get('/api/check_password/:password', (req, res) => {
+app.get('/api/get_password/:password', (req, res) => {
   (async () => {
     try {
       const document_ref = db.collection('users');
@@ -93,7 +93,7 @@ app.get('/api/check_password/:password', (req, res) => {
           .where('password', '==', req.params.password)
           .get()
           .then((querySnapshot) => {
-            if (querySnapshot.size>=1) {
+            if (querySnapshot.size==1) {
               return res.status(200).send(true);
             } else {
               return res.status(200).send(false);
@@ -105,6 +105,8 @@ app.get('/api/check_password/:password', (req, res) => {
     }
   })();
 });
+
+// Fetch password by mac id
 
 
 app.put('/api/update_mac_id/:email_id', (req, res) => {
@@ -122,6 +124,30 @@ app.put('/api/update_mac_id/:email_id', (req, res) => {
                 });
               });
               return res.status(200).send(true);
+            } else {
+              return res.status(200).send(false);
+            }
+          });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send(error);
+    }
+  })();
+});
+
+// get passowrd by mac id
+app.get('/api/get_password_mac_id/:mac_id', (req, res) => {
+  (async () => {
+    try {
+      const document_ref = db.collection('users');
+      document_ref
+          .where('mac_id', '==', req.params.mac_id)
+          .get()
+          .then((querySnapshot) => {
+            if (querySnapshot.size==1) {
+              querySnapshot.forEach((doc)=>{
+                return res.status(200).send(doc.data().password);
+              });
             } else {
               return res.status(200).send(false);
             }
@@ -185,5 +211,25 @@ app.get('/api/cleanup-expired', (req, res) => {
     }
   })();
 });
+
+// Add password as 'change-me' for all docs
+app.put('/api/update_password_all/', (req, res) => {
+  (async () => {
+    try {
+      db.collection('users').get().then(function(querySnapshot) {
+        querySnapshot.forEach(function(doc) {
+          doc.ref.update({
+            password: 'change-me',
+          });
+        });
+      });
+      return res.status(200).send('Updated');
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send(error);
+    }
+  })();
+});
+
 
 exports.app = functions.https.onRequest(app);
