@@ -1,8 +1,8 @@
 import requests
 from termcolor import colored
 
-# BASE_URL = "https://us-central1-pump-bot-e1abf.cloudfunctions.net/app/api"
-BASE_URL = 'http://localhost:5001/pump-bot-e1abf/us-central1/app/api'
+BASE_URL = "https://us-central1-pump-bot-e1abf.cloudfunctions.net/app/api"
+# BASE_URL_TESTING = 'http://localhost:5001/pump-bot-e1abf/us-central1/app/api'
 
 
 def get_user(mac_add):
