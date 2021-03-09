@@ -218,16 +218,22 @@ app.get('/api/cleanup-expired', (req, res) => {
 });
 
 // Add password as 'change-me' for all docs
-app.put('/api/update_password_all/', (req, res) => {
+app.put('/api/add_exp_all/', (req, res) => {
   (async () => {
     try {
-      db.collection('users').get().then(function(querySnapshot) {
-        querySnapshot.forEach(function(doc) {
-          doc.ref.update({
-            password: 'change-me',
+      const document_ref = db.collection('users');
+      document_ref
+          .where('status', '==', 'Trial')
+          .get()
+          .then((querySnapshot)=>{
+            querySnapshot.forEach((doc)=>{
+              doc.ref.update({
+                expiration_timestamp: admin.firestore.Timestamp.fromDate(
+                    new Date(new Date().getTime() + 3 * 24 * 60 * 60 * 1000)
+                ).toDate(),
+              });
+            });
           });
-        });
-      });
       return res.status(200).send('Updated');
     } catch (error) {
       console.log(error);
