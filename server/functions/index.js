@@ -20,7 +20,7 @@ app.post('/api/register-trial', (req, res) => {
     try {
       await db
           .collection('users')
-          .doc('/' + req.body.mac_id + '/')
+          .doc()
           .create({
             mac_id: req.body.mac_id,
             email_id: req.body.email_id,
