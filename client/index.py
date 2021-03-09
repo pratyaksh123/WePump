@@ -15,28 +15,20 @@ if response == "false":
     print("Enter password")
     password = input()
     # First check if this email already exists.
-    res_sign_in= api.check_email(email_inp)
+    res_sign_in= api.check_user(email_inp,password)
     if(res_sign_in=='true'):
-        # Email found already registered, to check auth , check the password too.
         print(colored('Email Already Registered with the BOT, signing in...','yellow'))
-        res_pass= api.get_password(password)
-        if(res_pass=='true'):
-            # True Account owner, but his mac address got changed, so update his previous account with the new mac id.
-            res_update_mac_id= api.update_mac_id(email_inp,mac_address)
-            if(res_update_mac_id=='true'):
-                print(
-                colored(
-                    "Welcome back, you are now signed in ! Please Rerun the bot to continue.",
-                    "green",))
-                exit()
-            elif(res_update_mac_id=='false'):
-                print(colored("Couldn't Login, please contact support, error code - 0X112", "yellow"))
-                exit()
-            else:
-                print(colored("Couldn't Login, please contact support, error code - 0X113", "yellow"))
-                exit()
-        elif(res_pass=='false'):
-            print(colored('Email and Password didn\'t matched','red'))
+        # True Account owner, but his mac address got changed, so update his previous account with the new mac id.
+        res_update_mac_id= api.update_mac_id(email_inp,mac_address)
+        if(res_update_mac_id=='true'):
+            print(
+            colored(
+                "Welcome back, you are now signed in ! Please Rerun the bot to continue.",
+                "green",))
+            exit()
+        elif(res_update_mac_id=='false'):
+            print(colored("Couldn't Login, please contact support, error code - 0X112", "yellow"))
+            exit()
         else:
             print(colored("Couldn't Login, please contact support, error code - 0X114", "yellow"))
             exit()

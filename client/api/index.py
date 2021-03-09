@@ -23,8 +23,8 @@ def register_trial_user(mac_add, email, password):
         return res.reason
 
 
-def check_email(email_id):
-    res = requests.get(BASE_URL + "/check_email/" + email_id)
+def check_user(email_id,password):
+    res = requests.get(BASE_URL + "/check_user/" + email_id+"/" + password)
     if res.status_code == 200:
         return res.text
     else:
@@ -41,13 +41,6 @@ def update_mac_id(email_id, mac_id):
 
 def get_password_mac_id(mac_id):
     res = requests.get(BASE_URL + "/get_password_mac_id/" + mac_id)
-    if res.status_code == 200:
-        return res.text
-    else:
-        return res.reason
-
-def get_password(password):
-    res = requests.get(BASE_URL + "/get_password/" + password)
     if res.status_code == 200:
         return res.text
     else:

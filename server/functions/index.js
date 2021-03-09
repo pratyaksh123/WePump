@@ -91,33 +91,12 @@ app.get('/api/get_time_left/:mac_id', (req, res) => {
   })();
 });
 
-app.get('/api/check_email/:email_id', (req, res) => {
+app.get('/api/check_user/:email_id/:password', (req, res) => {
   (async () => {
     try {
       const document_ref = db.collection('users');
       document_ref
           .where('email_id', '==', req.params.email_id)
-          .get()
-          .then((querySnapshot) => {
-            if (querySnapshot.size==1) {
-              return res.status(200).send(true);
-            } else {
-              return res.status(200).send(false);
-            }
-          });
-    } catch (error) {
-      console.log(error);
-      return res.status(500).send(error);
-    }
-  })();
-});
-
-
-app.get('/api/get_password/:password', (req, res) => {
-  (async () => {
-    try {
-      const document_ref = db.collection('users');
-      document_ref
           .where('password', '==', req.params.password)
           .get()
           .then((querySnapshot) => {
