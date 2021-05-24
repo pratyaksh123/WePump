@@ -18,7 +18,7 @@ Maybe, if you are fast enough to buy the announced coin at fast as you can. But 
 1. Use Binance APIs to build a python based CLI program where you can feed in essential info ( like amount, take profit, stop loss, etc .. ) and it does that for you.
 2. To make it even faster, I integrated telegram chat's message capture. So as soon as the Bot is open and the coin is announced ( usually they always prepend the coin name with a dollar sign, like $BTC, $ETH ) . the bot will automatically capture the correct coin name and place an immediate market buy order.
 
-## Some Stats xD
+## Some usage stats
 
 1. 40 + users registered and used the bot.
 2. 3 users took the premium subscription. ( $25 )
